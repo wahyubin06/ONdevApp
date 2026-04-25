@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Admin ONdev</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Roboto,sans-serif; }
+        body { background:#eef5f1; display:flex; justify-content:center; padding:16px 12px 30px; min-height:100vh; }
+        .app { max-width:500px; width:100%; }
+        .header { background:white; border-radius:24px; padding:16px 20px; display:flex; align-items:center; gap:12px; margin-bottom:16px; border:1px solid #cde3d8; }
+        .logo { background:#1e8e46; width:44px; height:44px; border-radius:14px; display:flex; align-items:center; justify-content:center; color:white; font-size:24px; }
+        .header h2 { font-size:22px; font-weight:700; color:#173e2b; }
+        .tabs { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+        .tab { background:white; border:1px solid #c4ddd0; padding:10px 14px; border-radius:20px; font-weight:600; color:#1e5a3c; cursor:pointer; font-size:13px; }
+        .tab.active { background:#1e8e46; color:white; }
+        .panel { display:none; }
+        .panel.active { display:block; }
+        .card { background:white; border-radius:20px; padding:14px; margin-bottom:10px; border:1px solid #d2e5db; }
+        .badge { background:#e0f0e6; padding:4px 12px; border-radius:20px; font-weight:600; color:#14532b; font-size:13px; }
+        .btn { background:#1e8e46; border:none; border-radius:30px; padding:10px 16px; color:white; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; font-size:13px; }
+        .btn-outline { background:white; border:1px solid #c2dbcf; color:#1e5a3c; }
+        .btn-danger { background:#e74c3c; }
+        .btn-wa { background:#25d366; }
+        .flex-between { display:flex; justify-content:space-between; align-items:center; }
+        .status { font-size:11px; padding:2px 8px; border-radius:12px; }
+        .status.online { background:#1e8e46; color:white; }
+        .status.trip { background:#f0a04b; color:white; }
+        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); align-items:center; justify-content:center; z-index:10; }
+        .modal.active { display:flex; }
+        .modal-content { background:white; border-radius:28px; padding:24px; width:90%; max-width:380px; max-height:85vh; overflow-y:auto; }
+        .form-group { margin-bottom:12px; }
+        .form-group label { font-weight:600; font-size:13px; color:#21533b; display:block; margin-bottom:4px; }
+        .form-group input, .form-group select { width:100%; padding:12px; border:1.5px solid #cde3d8; border-radius:16px; font-size:15px; background:#f9fdfb; }
+    </style>
+</head>
+<body>
+<div class="app">
+    <div class="header">
+        <div class="logo"><i class="fas fa-motorcycle"></i></div>
+        <div><h2>ONdev Admin</h2><small style="color:#4b7b64;">Firebase</small></div>
+    </div>
+    <div class="tabs">
+        <div class="tab active" data-tab="drivers"><i class="fas fa-id-card"></i> Driver</div>
+        <div class="tab" data-tab="orders"><i class="fas fa-clipboard-list"></i> Pesanan</div>
+        <div class="tab" data-tab="call"><i class="fas fa-phone"></i> Panggil</div>
+    </div>
+    <div class="panel active" id="panel-drivers">
+        <div class="flex-between" style="margin-bottom:10px;"><span class="badge" id="driverCount">0 driver</span><button class="btn" id="addDriverBtn"><i class="fas fa-plus"></i> Tambah</button></div>
+        <div id="driverList"></div>
+    </div>
+    <div class="panel" id="panel-orders">
+        <div class="flex-between" style="margin-bottom:10px;"><span class="badge" id="orderCount">0 pesanan</span><button class="btn" id="addOrderBtn"><i class="fas fa-plus"></i> Tambah</button></div>
+        <div id="orderList"></div>
+    </div>
+    <div class="panel" id="panel-call"><div id="jobCards"></div></div>
+</div>
+
+<!-- Modal Driver -->
+<div class="modal" id="driverModal">
+    <div class="modal-content">
+        <h3 style="color:#173e2b; margin-bottom:16px;">Tambah/Edit Driver</h3>
+        <form id="driverForm">
+            <input type="hidden" id="drvEditKey">
+            <div class="form-group"><label>Nama</label><input id="drvName" required></div>
+            <div class="form-group"><label>ID</label><input id="drvId" required></div>
+            <div class="form-group"><label>WhatsApp</label><input id="drvWa" placeholder="08xxx"></div>
+            <div class="form-group"><label>Kendaraan</label><input id="drvVehicle" placeholder="Motor & Plat"></div>
+            <button type="submit" class="btn" style="width:100%;">Simpan</button>
+        </form>
+        <button class="btn btn-outline close-modal" style="width:100%; margin-top:8px;">Batal</button>
+    </div>
+</div>
+
+<!-- Modal Pesanan -->
+<div class="modal" id="orderModal">
+    <div class="modal-content">
+        <h3 style="color:#173e2b; margin-bottom:16px;">Tambah Pesanan</h3>
+        <form id="orderForm">
+            <div class="form-group"><label>Pelanggan</label><input id="ordCustName" required></div>
+            <div class="form-group"><label>WA Pelanggan</label><input id="ordCustWa" placeholder="08xxx"></div>
+            <div class="form-group"><label>Jemput</label><input id="ordPickup" required></div>
+            <div class="form-group"><label>Tujuan</label><input id="ordDest" required></div>
+            <div class="form-group"><label>Driver</label><select id="ordDriver"></select></div>
+            <button type="submit" class="btn" style="width:100%;">Simpan</button>
+        </form>
+        <button class="btn btn-outline close-modal" style="width:100%; margin-top:8px;">Batal</button>
+    </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+    import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+
+    // ⚠️ TEMPEL KONFIGURASI FIREBASE ANDA DI BAWAH INI
+    const firebaseConfig = {
+          apiKey: "AIzaSyBRTtppmk-TVTmFqXK3lvYrY2asDYwJU2w",
+  authDomain: "ondave-backend.firebaseapp.com",
+  databaseURL: "https://ondave-backend-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "ondave-backend",
+  storageBucket: "ondave-backend.firebasestorage.app",
+  messagingSenderId: "977512849672",
+  appId: "1:977512849672:web:2742a594ee2864c813ccbd",
+  measurementId: "G-QW9HG52EGM"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    function waLink(phone, text) {
+        let n = (phone||'').replace(/\D/g, '');
+        if (n.startsWith('0')) n = '62' + n.substring(1);
+        else if (!n.startsWith('62')) n = '62' + n;
+        return `https://wa.me/${n}?text=${encodeURIComponent(text)}`;
+    }
+
+    let driversCache = {};
+    let ordersCache = {};
+
+    // Render Driver
+    onValue(ref(db, 'drivers'), snap => {
+        driversCache = snap.val() || {};
+        const entries = Object.entries(driversCache).map(([k,v]) => ({key:k, ...v}));
+        document.getElementById('driverList').innerHTML = entries.map(d => `
+            <div class="card" style="display:flex; align-items:center; gap:10px;">
+                <div style="flex:1;">
+                    <strong>${d.nama}</strong> <span class="status ${d.status==='online'?'online':'trip'}">${d.status||'online'}</span>
+                    <div style="font-size:12px;">${d.id} · ${d.kendaraan||'-'} · ⭐${d.rating||5} · ${d.trip||0} trip</div>
+                </div>
+                <button class="btn btn-outline edit-driver" data-key="${d.key}"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-danger del-driver" data-key="${d.key}"><i class="fas fa-trash"></i></button>
+            </div>`).join('');
+        document.getElementById('driverCount').textContent = entries.length + ' driver';
+        renderCallCards();
+        populateDriverSelect();
+    });
+
+    // Render Orders
+    onValue(ref(db, 'orders'), snap => {
+        ordersCache = snap.val() || {};
+        const entries = Object.entries(ordersCache).map(([k,v]) => ({key:k, ...v}));
+        document.getElementById('orderList').innerHTML = entries.map(o => {
+            const drv = Object.values(driversCache).find(d => d.id === o.driverId);
+            const drvName = drv ? drv.nama : 'Tidak ada';
+            return `
+            <div class="card">
+                <div class="flex-between"><strong>${o.customerName}</strong><span class="status trip">${o.status}</span></div>
+                <div style="font-size:13px;">${o.pickup} → ${o.destination}</div>
+                <div style="font-size:12px;">Driver: ${drvName} | ${o.key}</div>
+                <div style="margin-top:8px;">
+                    <button class="btn btn-danger del-order" data-key="${o.key}"><i class="fas fa-trash"></i></button>
+                    ${drv ? `<a href="${waLink(drv.wa, `Pesanan ${o.key} untuk ${o.customerName}`)}" target="_blank" class="btn btn-wa"><i class="fab fa-whatsapp"></i> Driver</a>` : ''}
+                </div>
+            </div>`;
+        }).join('');
+        document.getElementById('orderCount').textContent = entries.length + ' pesanan';
+    });
+
+    function populateDriverSelect() {
+        const select = document.getElementById('ordDriver');
+        select.innerHTML = '<option value="">-- Pilih Driver --</option>';
+        Object.values(driversCache).forEach(d => {
+            const opt = document.createElement('option');
+            opt.value = d.id;
+            opt.textContent = `${d.nama} (${d.id})`;
+            select.appendChild(opt);
+        });
+    }
+
+    function renderCallCards() {
+        const jobs = [
+            { name:'Antar Jemput', icon:'fa-user-check', price:'Rp9.000/km' },
+            { name:'Kirim Paket', icon:'fa-box', price:'Rp6.000/km' },
+            { name:'Titip Belanja', icon:'fa-shopping-basket', price:'Rp10.000/km' }
+        ];
+        document.getElementById('jobCards').innerHTML = jobs.map(j => `
+            <div class="card">
+                <div class="flex-between"><span><i class="fas ${j.icon}"></i> ${j.name}</span><span class="badge">${j.price}</span></div>
+                <select class="driver-select" style="width:100%; margin:8px 0; padding:10px; border-radius:16px;">
+                    ${Object.values(driversCache).map(d => `<option value="${d.wa}" data-name="${d.nama}">${d.nama} (${d.id})</option>`).join('')}
+                </select>
+                <button class="btn btn-wa call-btn" data-job="${j.name}" style="width:100%;"><i class="fab fa-whatsapp"></i> Panggil Driver</button>
+            </div>`).join('');
+        document.querySelectorAll('.call-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const card = this.closest('.card');
+                const select = card.querySelector('.driver-select');
+                const phone = select.value;
+                const driverName = select.options[select.selectedIndex].getAttribute('data-name');
+                const job = this.getAttribute('data-job');
+                if (!phone) return alert('Pilih driver.');
+                window.open(waLink(phone, `Halo ${driverName}, Anda dapat job: *${job}*.\nDari Admin ONdev.`), '_blank');
+            });
+        });
+    }
+
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+        });
+    });
+
+    // Modal
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModals() { document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); }
+    document.querySelectorAll('.close-modal').forEach(b => b.addEventListener('click', closeModals));
+    document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => { if (e.target === m) closeModals(); }));
+
+    // Driver CRUD
+    document.getElementById('addDriverBtn').addEventListener('click', () => {
+        document.getElementById('driverForm').reset();
+        document.getElementById('drvEditKey').value = '';
+        openModal('driverModal');
+    });
+    document.getElementById('driverForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const editKey = document.getElementById('drvEditKey').value;
+        const data = {
+            id: document.getElementById('drvId').value.trim(),
+            nama: document.getElementById('drvName').value.trim(),
+            wa: document.getElementById('drvWa').value.trim() || '083161540615',
+            kendaraan: document.getElementById('drvVehicle').value.trim(),
+            rating: 5.0,
+            trip: 0,
+            status: 'online'
+        };
+        if (!data.id || !data.nama) return alert('Lengkapi data.');
+        if (editKey) update(ref(db, 'drivers/' + editKey), data);
+        else push(ref(db, 'drivers'), data);
+        closeModals();
+    });
+    document.addEventListener('click', e => {
+        if (e.target.closest('.edit-driver')) {
+            const key = e.target.closest('.edit-driver').dataset.key;
+            const d = driversCache[key];
+            if (!d) return;
+            document.getElementById('drvEditKey').value = key;
+            document.getElementById('drvId').value = d.id;
+            document.getElementById('drvName').value = d.nama;
+            document.getElementById('drvWa').value = d.wa || '';
+            document.getElementById('drvVehicle').value = d.kendaraan || '';
+            openModal('driverModal');
+        }
+        if (e.target.closest('.del-driver')) {
+            const key = e.target.closest('.del-driver').dataset.key;
+            if (confirm('Hapus driver?')) remove(ref(db, 'drivers/' + key));
+        }
+        if (e.target.closest('.del-order')) {
+            const key = e.target.closest('.del-order').dataset.key;
+            if (confirm('Hapus pesanan?')) remove(ref(db, 'orders/' + key));
+        }
+    });
+
+    // Order CRUD
+    document.getElementById('addOrderBtn').addEventListener('click', () => {
+        document.getElementById('orderForm').reset();
+        populateDriverSelect();
+        openModal('orderModal');
+    });
+    document.getElementById('orderForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const order = {
+            customerName: document.getElementById('ordCustName').value.trim(),
+            customerPhone: document.getElementById('ordCustWa').value.trim(),
+            pickup: document.getElementById('ordPickup').value.trim(),
+            destination: document.getElementById('ordDest').value.trim(),
+            driverId: document.getElementById('ordDriver').value,
+            status: 'menunggu'
+        };
+        if (!order.customerName || !order.pickup || !order.destination || !order.driverId) return alert('Lengkapi data.');
+        push(ref(db, 'orders'), order);
+        closeModals();
+    });
+</script>
+</body>
+</html>

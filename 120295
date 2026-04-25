@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ONdev · Ojek & Kurir</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Roboto,sans-serif; }
+        body { background:#eef5f1; display:flex; justify-content:center; align-items:center; min-height:100vh; padding:20px 16px; }
+        .container { max-width:420px; width:100%; background:white; border-radius:36px; padding:28px 20px 32px; box-shadow:0 20px 40px rgba(0,20,10,0.06); border:1px solid #cde3d8; text-align:center; }
+        .logo-section { display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:8px; }
+        .logo-icon { background:#1e8e46; width:60px; height:60px; border-radius:20px; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 14px rgba(30,142,70,0.2); }
+        .logo-icon i { font-size:32px; color:white; }
+        h1 { font-size:32px; font-weight:800; color:#173e2b; letter-spacing:-0.5px; }
+        .subtitle { font-size:14px; color:#4b7662; font-weight:500; margin-bottom:24px; }
+        .service-menu { display:flex; flex-direction:column; gap:16px; margin-bottom:28px; }
+        .menu-card { display:flex; align-items:center; gap:14px; background:#f9fdfb; border:1.5px solid #d2e5db; border-radius:24px; padding:16px 18px; text-decoration:none; color:inherit; transition:all 0.15s; box-shadow:0 4px 8px rgba(0,0,0,0.02); text-align:left; }
+        .menu-card:active { background:#e6f3ec; border-color:#1e8e46; transform:scale(0.98); }
+        .menu-icon { width:52px; height:52px; border-radius:18px; background:white; display:flex; align-items:center; justify-content:center; color:#1e8e46; font-size:26px; box-shadow:0 4px 8px rgba(0,0,0,0.04); border:1px solid #deede5; flex-shrink:0; }
+        .menu-text { flex:1; }
+        .menu-text h3 { font-size:17px; font-weight:700; color:#1e3a2c; margin-bottom:2px; }
+        .menu-text .desc { font-size:12px; color:#5f7c6e; margin-bottom:4px; }
+        .price-tag { display:inline-block; background:#e0f0e6; color:#1a5c3a; font-weight:700; font-size:13px; padding:4px 12px; border-radius:16px; margin-top:4px; }
+        .footer-note { font-size:13px; color:#7aa290; margin-top:10px; }
+        .footer-note i { color:#1e8e46; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="logo-section">
+        <div class="logo-icon"><i class="fas fa-motorcycle"></i></div>
+        <div><h1>ONdev</h1><div class="subtitle">Ojek & Kurir Panggilan</div></div>
+    </div>
+    <div class="service-menu">
+        <a href="https://wa.me/6283161540615?text=Halo%20ONdev%2C%20saya%20mau%20*antar%20jemput*.%0A%0A📍%20Lokasi%20jemput%3A%20%0A📍%20Tujuan%3A%20%0A🕒%20Waktu%3A%20" class="menu-card" target="_blank">
+            <div class="menu-icon"><i class="fas fa-user-check"></i></div>
+            <div class="menu-text"><h3>Antar Jemput</h3><div class="desc">Dijemput & diantar tepat tujuan</div><span class="price-tag">Rp9.000/km</span></div>
+        </a>
+        <a href="https://wa.me/6283161540615?text=Halo%20ONdev%2C%20saya%20mau%20*kirim%20paket*.%0A%0A📦%20Isi%20paket%3A%20%0A📍%20Alamat%20jemput%3A%20%0A📍%20Alamat%20tujuan%3A%20%0A📞%20Nama%20penerima%3A%20" class="menu-card" target="_blank">
+            <div class="menu-icon"><i class="fas fa-box"></i></div>
+            <div class="menu-text"><h3>Kirim Paket</h3><div class="desc">Dokumen, barang, makanan</div><span class="price-tag">Rp6.000/km</span></div>
+        </a>
+        <a href="https://wa.me/6283161540615?text=Halo%20ONdev%2C%20saya%20mau%20*titip%20belanja*.%0A%0A🛒%20Toko%2Ftempat%20belanja%3A%20%0A🛍️%20Barang%20yang%20dibeli%3A%20%0A📍%20Diantar%20ke%3A%20" class="menu-card" target="_blank">
+            <div class="menu-icon"><i class="fas fa-shopping-basket"></i></div>
+            <div class="menu-text"><h3>Titip Belanja</h3><div class="desc">Warung, minimarket, apotek</div><span class="price-tag">Rp10.000/km</span></div>
+        </a>
+    </div>
+    <div class="footer-note"><i class="fab fa-whatsapp"></i> Klik menu, langsung terhubung WhatsApp ONdev</div>
+</div>
+</body>
+</html>
